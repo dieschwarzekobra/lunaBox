@@ -12,15 +12,25 @@ episodeURLs = []
 PASSED_URL = ''
 
 #Pygame Variables
+##Surfaces
 DISPLAYSURF = ''
-WIDTH = 800
-HEIGHT = 600
-FONT_SIZE = 24
+
+##Dimensions and Sizes
+WIDTH = 1280
+HEIGHT = 720
+FONT_SIZE = 32
+PADDING = 60
+
+##Colors
 BABYBLUE = (99, 187, 214)
 WHITE = (255, 255, 255)
 PINK = (252, 35, 158)
+
+##Images and fonts
 BASEFONT = pygame.font.Font('CREAMPUF.ttf', FONT_SIZE) # Downloaded as freeware under commercial use allowed license on Fontspace
 WINDOW_ICON = pygame.image.load('crystal-star-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
+MENU_IMAGE = pygame.image.load('titleBanner.png') # Snagged from the Sailor Moon Wikia: http://sailormoon.wikia.com/wiki/Ami_Mizuno, retrieved using Google
+SELECTOR = pygame.image.load('crisis-moon-compact-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
 
 #SQLite3 Variables
 STATEMENT_PRINT_ALL_TITLES = 'SELECT * FROM sailorMoon'
@@ -39,17 +49,26 @@ def countRows(statement):
 
 # Main Loop for the program
 def runProgram():
+
+  # Initialize all of the graphics
   initDisplay()
   pygame.display.flip()
+  printEpisodes()
+  drawSelector()
+  drawPaginator()
+
+  # Initialize counts
   totalNum = countRows(STATEMENT_PRINT_ALL_TITLES)  
   global numEpisodesPrinted
-  printEpisodes()
+
+  # Initialize main loop
   while numEpisodesPrinted < totalNum:
     paginate()
 
 # Print limited number of results
 def printEpisodes():
-  topCoord = 0
+  # Set topCoord starting point for the episodes to start printing from in the display
+  topCoord = PADDING
   for row in c.execute(STATEMENT_PAGINATE):
     # Update the count of the number of episodes printed
     global numEpisodesPrinted
@@ -62,21 +81,30 @@ def printEpisodes():
     ep = str(numEpisodesPrinted) + ". " + row[1]
     print ep
 
-    #Print the title and number of the episode to a surface
+    # Print the title and number of the episode to a surface
     epSurf = BASEFONT.render(ep, True, WHITE, PINK)
     epSurfRect = epSurf.get_rect() 
     epSurfRect.top = topCoord
+    epSurfRect.left = MENU_IMAGE.get_width()
+
+    # Print episode surface onto main surface and update the display
     DISPLAYSURF.blit(epSurf, epSurfRect)
-    topCoord += epSurfRect.height
     pygame.display.flip()
 
-  topCoord = 0
+    # Reset the topCoord so that the episode titles do not overlap
+    topCoord += epSurfRect.height + 50
+
+  # Reset the topCoord to PADDING for the next set of results
+  topCoord = PADDING
+
 
 #Wait for user input before continuing to print results or URL
 def paginate():
   userInput = raw_input("Enter 'next', 'quit', or your episode number of choice to continue: ")
   if userInput == "next":
     printEpisodes()
+    drawPaginator()
+    drawSelector()
     pygame.display.flip()
   elif userInput == "quit":
     sys.exit("Bye bye!")
@@ -92,16 +120,39 @@ def openSelectedURL():
 
 #Initialize the Pygame Surface
 def initDisplay():
-  global DISPLAYSURF, WIDTH, HEIGHT, WINDOW_ICON, BABYBLUE
+  global DISPLAYSURF
   pygame.display.init()
 
   # Customize the icon that displays with the window
   pygame.display.set_icon(WINDOW_ICON)
 
   #Initialize the surface
-  DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),pygame.RESIZABLE)
+  DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT))
 
   #Fill the surface with a color.
   DISPLAYSURF.fill(BABYBLUE)
+
+  #Draw the menu image
+  MENU_IMAGE_RECT = MENU_IMAGE.get_rect()
+  DISPLAYSURF.blit(MENU_IMAGE, MENU_IMAGE_RECT)
+
+
+#Draw the selector
+def drawSelector():
+  SELECTOR_RECT = SELECTOR.get_rect()
+  SELECTOR_RECT.left = WIDTH/2
+  SELECTOR_RECT.top = PADDING
+  DISPLAYSURF.blit(SELECTOR, SELECTOR_RECT)
+  pygame.display.flip()
+  
+
+#Draw the paginator
+def drawPaginator():
+  PAGINATOR = BASEFONT.render("Next", True, WHITE, PINK)
+  PAGINATOR_RECT = PAGINATOR.get_rect()
+  PAGINATOR_RECT.left = WIDTH - PAGINATOR.get_width()
+  PAGINATOR_RECT.top = HEIGHT - (PAGINATOR.get_height() + PADDING)
+  DISPLAYSURF.blit(PAGINATOR, PAGINATOR_RECT)
+  pygame.display.flip()
 
 runProgram()
