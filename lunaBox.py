@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, sys, webbrowser
 
 # Define and initialize global variables
 numEpisodesPrinted = 0
@@ -42,17 +42,19 @@ def printEpisodes():
 
 #Wait for user input before continuing to print results or URL
 def paginate():
-  userInput = raw_input("Enter yes your episode number of choice to continue: ")
-  if userInput == "Yes":
+  userInput = raw_input("Enter 'next', 'quit', or your episode number of choice to continue: ")
+  if userInput == "next":
     printEpisodes()
+  elif userInput == "quit":
+    sys.exit("Bye bye!")
   else:
     global episodeURLs
     global PASSED_URL
     PASSED_URL = episodeURLs[int(userInput)-1]
-    printSelectedURL()
+    openSelectedURL()
 
 #Print the selected episodeURL
-def printSelectedURL():
-  print PASSED_URL
+def openSelectedURL():
+  webbrowser.open(PASSED_URL)
 
 runProgram()
