@@ -1,5 +1,8 @@
 import pygame, sqlite3, sys, webbrowser
 
+#Initialize all pygame modules
+pygame.init()
+
 # Define and initialize global variables
 
 #Program Variables
@@ -12,7 +15,11 @@ PASSED_URL = ''
 DISPLAYSURF = ''
 WIDTH = 800
 HEIGHT = 600
+FONT_SIZE = 24
 BABYBLUE = (99, 187, 214)
+WHITE = (255, 255, 255)
+PINK = (252, 35, 158)
+BASEFONT = pygame.font.Font('CREAMPUF.ttf', FONT_SIZE) # Downloaded as freeware under commercial use allowed license on Fontspace
 WINDOW_ICON = pygame.image.load('crystal-star-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
 
 #SQLite3 Variables
@@ -42,6 +49,7 @@ def runProgram():
 
 # Print limited number of results
 def printEpisodes():
+  topCoord = 0
   for row in c.execute(STATEMENT_PAGINATE):
     # Update the count of the number of episodes printed
     global numEpisodesPrinted
@@ -50,8 +58,19 @@ def printEpisodes():
     # Add URL of the current episode to the array of callable URLs / episodes
     episodeURLs.append(row[0])
 
-    # Print the title and number of the episode
-    print str(numEpisodesPrinted) + ". " + row[1]
+    # Print the title and number of the episode to the console
+    ep = str(numEpisodesPrinted) + ". " + row[1]
+    print ep
+
+    #Print the title and number of the episode to a surface
+    epSurf = BASEFONT.render(ep, True, WHITE, PINK)
+    epSurfRect = epSurf.get_rect() 
+    epSurfRect.top = topCoord
+    DISPLAYSURF.blit(epSurf, epSurfRect)
+    topCoord += epSurfRect.height
+    pygame.display.flip()
+
+  topCoord = 0
 
 #Wait for user input before continuing to print results or URL
 def paginate():
@@ -67,7 +86,7 @@ def paginate():
     PASSED_URL = episodeURLs[int(userInput)-1]
     openSelectedURL()
 
-#Print the selected episodeURL
+#Open the selected episodeURL
 def openSelectedURL():
   webbrowser.open(PASSED_URL)
 
