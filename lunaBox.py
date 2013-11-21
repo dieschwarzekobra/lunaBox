@@ -63,7 +63,8 @@ def runProgram():
 
   # Initialize main loop
   while numEpisodesPrinted < totalNum:
-    paginate()
+    #paginate()
+    keyPressed()
 
 # Print limited number of results
 def printEpisodes():
@@ -154,5 +155,16 @@ def drawPaginator():
   PAGINATOR_RECT.top = HEIGHT - (PAGINATOR.get_height() + PADDING)
   DISPLAYSURF.blit(PAGINATOR, PAGINATOR_RECT)
   pygame.display.flip()
+
+#Define Key Events
+def keyPressed():
+  #Listen for keydown events
+  for event in pygame.event.get():
+    if event.type == pygame.KEYDOWN: #If the user presses a key...
+      if event.key == pygame.K_LEFT:
+        print "Left"
+      elif event.key == pygame.K_RIGHT:
+        print "Right"
+      print "True"
 
 runProgram()
