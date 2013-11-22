@@ -288,10 +288,11 @@ def initDisplay():
 
   #Initialize other surfaces
   printEpisodes("START")
-  drawSelector()
+  #drawSelector()
   #URL = 1
   #PASSED_URL = episodeURLs[URL]
   drawPaginator()
+  drawStart()
 
 #####################################################################################################
 
@@ -301,6 +302,27 @@ def drawSelector():
   DISPLAYSURF.blit(SELECTOR, SELECTOR_RECT)
   pygame.display.flip()
   
+
+#####################################################################################################
+
+#Draw the start screen
+def drawStart():
+  topCoord = PADDING
+  START_TEXT = ["Press enter to select an episode. Use up", "and down to navigate the list of episodes,", "and right and left to paginate. Press q to quit."]
+  for text in START_TEXT:
+
+    # Print the title and number of the episode to a surface
+    epSurf = BASEFONT.render(text, True, WHITE)
+    epSurfRect = epSurf.get_rect() 
+    epSurfRect.top = topCoord
+    epSurfRect.left = MENU_IMAGE.get_width()
+
+    # Print episode surface onto main surface and update the display
+    DISPLAYSURF.blit(epSurf, epSurfRect)
+    pygame.display.flip()
+
+    # Reset the topCoord so that the episode titles do not overlap
+    topCoord += epSurfRect.height + 50
 
 #####################################################################################################
 
