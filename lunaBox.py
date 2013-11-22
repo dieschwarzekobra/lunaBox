@@ -10,25 +10,19 @@ pygame.init()
 
 #Program Variables
 numEpisodesPrinted = 0
-count = 0
-episodes = []
-episodeURLs = []
-PASSED_URL = ''
-#printed = numEpisodesPrinted
-greatestEpisode = 0
-begOfCurrentGroup = 0
-episodeList = []
-endOfPreviousGroup = ''
-counter = 0
-page = []
-pageURLs = []
-#####################################################################################################
+totalNumEpisodes = 0
+episodes = [] #List of all of the episodes in the database
+episodeURLs = [] #List of all of the episode URLs in the database
+page = [] #List of episodes that go on one page
+pageURLs = [] #List of episode URLs that go on one page
+URL = numEpisodesPrinted #Index for the array of pageURLs
+PASSED_URL = '' #URL to be passed to the video player
 
+#####################################################################################################
 
 #Pygame Variables
 ##Surfaces
 DISPLAYSURF = ''
-URL = numEpisodesPrinted
 
 #####################################################################################################
 
@@ -36,7 +30,7 @@ URL = numEpisodesPrinted
 WIDTH = 1280
 HEIGHT = 720
 FONT_SIZE = 32
-PADDING = 60
+PADDING = 280
 
 #####################################################################################################
 
@@ -51,6 +45,8 @@ PINK = (252, 35, 158)
 BASEFONT = pygame.font.Font('CREAMPUF.ttf', FONT_SIZE) # Downloaded as freeware under commercial use allowed license on Fontspace
 WINDOW_ICON = pygame.image.load('crystal-star-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
 MENU_IMAGE = pygame.image.load('titleBanner.png') # Snagged from the Sailor Moon Wikia: http://sailormoon.wikia.com/wiki/Ami_Mizuno, retrieved using Google
+
+##SELECTOR - global because position changes
 SELECTOR = pygame.image.load('crisis-moon-compact-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
 SELECTOR_RECT = SELECTOR.get_rect()
 SELECTOR_RECT.left = WIDTH/2
@@ -60,9 +56,6 @@ SELECTOR_RECT.top = PADDING
 
 ##SQLite3 Variables
 ALL_TITLES = 'SELECT * FROM sailorMoon'
-PAGINATE = ''
-FORWARD = str(numEpisodesPrinted)
-BACKWARD = str(numEpisodesPrinted - 6)
 LIMIT = 3
 
 #####################################################################################################
@@ -81,9 +74,9 @@ c = conn.cursor()
 # Count all of the rows in the database
 def countRows(statement):
   for row in c.execute(statement):
-    global count
-    count += 1
-  return count
+    global totalNumEpisodes
+    totalNumEpisodes += 1
+  return totalNumEpisodes
 
 #####################################################################################################
 
@@ -118,12 +111,12 @@ def grabEpisodes(direction):
   global numEpisodesPrinted, page, pageURLs
 
   i = numEpisodesPrinted
-  lastI = count - i
+  lastI = totalNumEpisodes - i
   page = []
   pageURLs = []
 
   #If going forward, grab episodes i through i+3
-  if (direction == "FORWARD") and (i+3 <= count):
+  if (direction == "FORWARD") and (i+3 <= totalNumEpisodes):
     for x in range(i, i+3):
       page.append(episodes[x])
       pageURLs.append(episodeURLs[x])
@@ -146,9 +139,6 @@ def grabEpisodes(direction):
     for x in range((i - (3+(i % 3))),(i - (i%3))):
       page.append(episodes[x])
       pageURLs.append(episodeURLs[x])
-      print pageURLs
-    
-    print numEpisodesPrinted
 
   elif direction == "SAME":
      for x in range(i-3, i):
@@ -156,22 +146,21 @@ def grabEpisodes(direction):
        pageURLs.append(episodeURLs[x])
 
   return page
+
 #####################################################################################################
 
 # Print limited number of results
 def printEpisodes(direction):
 
-
   #Initialize variables
   topCoord = PADDING
 
-  global episodes, epArray, episodeURLs, begOfCurrentGroup
+  global episodes, epArray, episodeURLs
   epArray = grabEpisodes(direction)
 
   drawBackground()
 
   for i in range(len(epArray)):
-
 
     # Print the title and number of the episode to the console
     ep = epArray[i]
@@ -189,7 +178,6 @@ def printEpisodes(direction):
     # Reset the topCoord so that the episode titles do not overlap
     topCoord += epSurfRect.height + 50
 
-    
 
   # Reset the topCoord to PADDING for the next set of results
   topCoord = PADDING
@@ -200,13 +188,11 @@ def printEpisodes(direction):
 #Wait for user input before continuing to print results or URL
 def paginate(keyPressed):
 
-  global numEpisodesPrinted, URL,  greatestEpisode, PASSED_URL
+  global numEpisodesPrinted, URL, PASSED_URL
   
   if keyPressed == "Right":
     URL = numEpisodesPrinted
     printEpisodes("FORWARD")
-    #print str(URL) + " FORWARD"
-    #print len(episodeURLs)
     PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = PADDING
     drawPaginator()
@@ -221,8 +207,6 @@ def paginate(keyPressed):
       URL = URL - 6
     else:
       URL = 0
-    #print str(URL) + " BACKWARD"
-    #print len(episodeURLs)
     PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = PADDING
     drawPaginator()
@@ -234,18 +218,16 @@ def paginate(keyPressed):
   elif keyPressed == "Quit":
     sys.exit("Bye bye!")
 
-  elif (keyPressed == "Up") and ((URL-1) >= (numEpisodesPrinted - 4)):
+  elif (keyPressed == "Up") and ((URL-1) > (numEpisodesPrinted - 4)):
     URL = URL - 1
-    print str(URL) + " URL"
     PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = SELECTOR_RECT.top - SELECTOR.get_height()
     printEpisodes("SAME")
     drawSelector()
     drawPaginator()   
 
-  elif keyPressed == "Down": #and ((URL + 1) <= numEpisodesPrinted):
+  elif keyPressed == "Down" and ((URL + 1) < numEpisodesPrinted):
     URL = URL + 1
-    print str(URL) + " URL"
     PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = SELECTOR_RECT.top + SELECTOR.get_height()
     printEpisodes("SAME")
@@ -256,8 +238,7 @@ def paginate(keyPressed):
 
 #Open the selected episodeURL
 def openSelectedURL():
-#  webbrowser.open(#PASSED_URL)
-  
+  webbrowser.open(PASSED_URL)
   print PASSED_URL
 
 #####################################################################################################
@@ -265,6 +246,12 @@ def openSelectedURL():
 def drawBackground():
   #Fill the surface with a color.
   DISPLAYSURF.fill(BABYBLUE)
+
+  #Draw the background
+  BACKGROUND = pygame.image.load('lovehardtwihardBG.jpg') #Image by Lovehardtwihard on Deviantart, retrieved with Google
+  BACKGROUND_RECT = BACKGROUND.get_rect()
+  BACKGROUND_RECT.left = MENU_IMAGE.get_width()
+  DISPLAYSURF.blit(BACKGROUND, BACKGROUND_RECT)
 
   #Draw the menu image
   MENU_IMAGE_RECT = MENU_IMAGE.get_rect()
@@ -288,9 +275,6 @@ def initDisplay():
 
   #Initialize other surfaces
   printEpisodes("START")
-  #drawSelector()
-  #URL = 1
-  #PASSED_URL = episodeURLs[URL]
   drawPaginator()
   drawStart()
 
@@ -308,7 +292,7 @@ def drawSelector():
 #Draw the start screen
 def drawStart():
   topCoord = PADDING
-  START_TEXT = ["Press enter to select an episode. Use up", "and down to navigate the list of episodes,", "and right and left to paginate. Press q to quit."]
+  START_TEXT = ["Press enter to select an episode. Use up and", "down to navigate the list of episodes, and right", "and left to paginate. Press q to quit."]
   for text in START_TEXT:
 
     # Print the title and number of the episode to a surface
@@ -322,7 +306,7 @@ def drawStart():
     pygame.display.flip()
 
     # Reset the topCoord so that the episode titles do not overlap
-    topCoord += epSurfRect.height + 50
+    topCoord += epSurfRect.height + 10
 
 #####################################################################################################
 
@@ -341,7 +325,7 @@ def drawPaginator():
 def keyDownEvents():
 
   #Initialize variables
-  global programRunning, count
+  global programRunning, totalNumEpisodes
 
   #Listen for keydown events
   for event in pygame.event.get():
@@ -350,7 +334,7 @@ def keyDownEvents():
         if (numEpisodesPrinted - 3) > 1:
           paginate("Left")
       elif event.key == pygame.K_RIGHT: #If the user presses the right arrow...
-        if (numEpisodesPrinted) <= count:
+        if (numEpisodesPrinted) < totalNumEpisodes:
           paginate("Right")
       elif event.key == pygame.K_q: #If the user presses q, quit the program.
         paginate("Quit")
