@@ -13,7 +13,7 @@ numEpisodesPrinted = 0
 count = 0
 episodes = []
 episodeURLs = []
-#PASSED_URL = ''
+PASSED_URL = ''
 #printed = numEpisodesPrinted
 greatestEpisode = 0
 begOfCurrentGroup = 0
@@ -142,11 +142,18 @@ def grabEpisodes(direction):
       pageURLs.append(episodeURLs[x])
     numEpisodesPrinted = numEpisodesPrinted - 3
   elif direction == "BACKWARD":
+    numEpisodesPrinted = numEpisodesPrinted - (i % 3)
     for x in range((i - (3+(i % 3))),(i - (i%3))):
       page.append(episodes[x])
       pageURLs.append(episodeURLs[x])
-    numEpisodesPrinted = numEpisodesPrinted - (i % 3)
+      print pageURLs
+    
     print numEpisodesPrinted
+
+  elif direction == "SAME":
+     for x in range(i-3, i):
+       page.append(episodes[x])
+       pageURLs.append(episodeURLs[x])
 
   return page
 #####################################################################################################
@@ -193,28 +200,30 @@ def printEpisodes(direction):
 #Wait for user input before continuing to print results or URL
 def paginate(keyPressed):
 
-  global numEpisodesPrinted, URL,  greatestEpisode
-  URL = numEpisodesPrinted
+  global numEpisodesPrinted, URL,  greatestEpisode, PASSED_URL
   
   if keyPressed == "Right":
+    URL = numEpisodesPrinted
     printEpisodes("FORWARD")
-    #URL = URL
     #print str(URL) + " FORWARD"
     #print len(episodeURLs)
-    #PASSED_URL = episodeURLs[URL]
+    PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = PADDING
     drawPaginator()
     drawSelector()
 
   elif keyPressed == "Left":
+    URL = numEpisodesPrinted
     printEpisodes("BACKWARD")
-    if URL - 6 >= 0:
+    if (URL - 6 >= 0) and (URL%3 != 0):
+      URL = URL - (3+(URL % 3))
+    elif (URL-6 >= 0):
       URL = URL - 6
     else:
       URL = 0
     #print str(URL) + " BACKWARD"
     #print len(episodeURLs)
-    #PASSED_URL = episodeURLs[URL]
+    PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = PADDING
     drawPaginator()
     drawSelector()
@@ -228,16 +237,16 @@ def paginate(keyPressed):
   elif (keyPressed == "Up") and ((URL-1) >= (numEpisodesPrinted - 4)):
     URL = URL - 1
     print str(URL) + " URL"
-    ##PASSED_URL = episodeURLs[URL]
+    PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = SELECTOR_RECT.top - SELECTOR.get_height()
     printEpisodes("SAME")
     drawSelector()
     drawPaginator()   
 
-  elif keyPressed == "Down" and ((URL + 2) < numEpisodesPrinted):
+  elif keyPressed == "Down": #and ((URL + 1) <= numEpisodesPrinted):
     URL = URL + 1
     print str(URL) + " URL"
-    #PASSED_URL = episodeURLs[URL]
+    PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = SELECTOR_RECT.top + SELECTOR.get_height()
     printEpisodes("SAME")
     drawSelector()
@@ -249,7 +258,7 @@ def paginate(keyPressed):
 def openSelectedURL():
 #  webbrowser.open(#PASSED_URL)
   
-  print #PASSED_URL
+  print PASSED_URL
 
 #####################################################################################################
 
