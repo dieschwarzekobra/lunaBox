@@ -1,4 +1,4 @@
-import pygame, sqlite3, sys, webbrowser
+import pygame, sqlite3, subprocess, sys, webbrowser
 
 #Initialize all pygame modules
 pygame.init()
@@ -238,7 +238,8 @@ def paginate(keyPressed):
 
 #Open the selected episodeURL
 def openSelectedURL():
-  webbrowser.open(PASSED_URL)
+  #webbrowser.open(PASSED_URL)
+  subprocess.call( [ "omxplayer", "-o", "hdmi", PASSED_URL])
   print PASSED_URL
 
 #####################################################################################################
