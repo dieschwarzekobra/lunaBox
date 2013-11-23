@@ -43,8 +43,8 @@ PINK = (252, 35, 158)
 
 ##Images and fonts
 BASEFONT = pygame.font.Font('CREAMPUF.TTF', FONT_SIZE) # Downloaded as freeware under commercial use allowed license on Fontspace
-WINDOW_ICON = pygame.image.load('crystal-star-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
-MENU_IMAGE = pygame.image.load('titleBanner.png') # Snagged from the Sailor Moon Wikia: http://sailormoon.wikia.com/wiki/Ami_Mizuno, retrieved using Google
+#WINDOW_ICON = pygame.image.load('crystal-star-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
+#MENU_IMAGE = pygame.image.load('titleBanner.png') # Snagged from the Sailor Moon Wikia: http://sailormoon.wikia.com/wiki/Ami_Mizuno, retrieved using Google
 
 ##SELECTOR - global because position changes
 SELECTOR = pygame.image.load('crisis-moon-compact-icon.png') # Image by Carla Rodriguez retrieved using google, downloaded from imagearchive.com, under free for non-commercial use license
@@ -158,7 +158,7 @@ def printEpisodes(direction):
   global episodes, epArray, episodeURLs
   epArray = grabEpisodes(direction)
 
-  drawBackground()
+ # drawBackground()
 
   for i in range(len(epArray)):
 
@@ -169,7 +169,7 @@ def printEpisodes(direction):
     epSurf = BASEFONT.render(ep, True, WHITE, PINK)
     epSurfRect = epSurf.get_rect() 
     epSurfRect.top = topCoord
-    epSurfRect.left = MENU_IMAGE.get_width()
+  #  epSurfRect.left = MENU_IMAGE.get_width()
 
     # Print episode surface onto main surface and update the display
     DISPLAYSURF.blit(epSurf, epSurfRect)
@@ -195,7 +195,7 @@ def paginate(keyPressed):
     printEpisodes("FORWARD")
     PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = PADDING
-    drawPaginator()
+   # drawPaginator()
     drawSelector()
 
   elif keyPressed == "Left":
@@ -209,7 +209,7 @@ def paginate(keyPressed):
       URL = 0
     PASSED_URL = episodeURLs[URL]
     SELECTOR_RECT.top = PADDING
-    drawPaginator()
+    #drawPaginator()
     drawSelector()
 
   elif keyPressed == "Return":
@@ -224,7 +224,7 @@ def paginate(keyPressed):
     SELECTOR_RECT.top = SELECTOR_RECT.top - SELECTOR.get_height()
     printEpisodes("SAME")
     drawSelector()
-    drawPaginator()   
+   # drawPaginator()   
 
   elif keyPressed == "Down" and ((URL + 1) < numEpisodesPrinted):
     URL = URL + 1
@@ -232,7 +232,7 @@ def paginate(keyPressed):
     SELECTOR_RECT.top = SELECTOR_RECT.top + SELECTOR.get_height()
     printEpisodes("SAME")
     drawSelector()
-    drawPaginator()
+    #drawPaginator()
 
 #####################################################################################################
 
@@ -240,27 +240,25 @@ def paginate(keyPressed):
 def openSelectedURL():
   #webbrowser.open(PASSED_URL)
   epDL = 'youtube-dl --max-quality 35 -g ' + PASSED_URL
-  pygame.display.quit()
   PASSED = subprocess.check_output(epDL, shell=True)
   subprocess.call( [ "omxplayer", PASSED])
-  initDisplay() 
-#print PASSED#_URL
+  print PASSED#_URL
 
 #####################################################################################################
 
-def drawBackground():
+#def drawBackground():
   #Fill the surface with a color.
-  DISPLAYSURF.fill(BABYBLUE)
+  #DISPLAYSURF.fill(BABYBLUE)
 
   #Draw the background
-  BACKGROUND = pygame.image.load('lovehardtwihardBG.jpg') #Image by Lovehardtwihard on Deviantart, retrieved with Google
-  BACKGROUND_RECT = BACKGROUND.get_rect()
-  BACKGROUND_RECT.left = MENU_IMAGE.get_width()
-  DISPLAYSURF.blit(BACKGROUND, BACKGROUND_RECT)
+  #BACKGROUND = pygame.image.load('lovehardtwihardBG.jpg') #Image by Lovehardtwihard on Deviantart, retrieved with Google
+  #BACKGROUND_RECT = BACKGROUND.get_rect()
+  #BACKGROUND_RECT.left = MENU_IMAGE.get_width()
+  #DISPLAYSURF.blit(BACKGROUND, BACKGROUND_RECT)
 
   #Draw the menu image
-  MENU_IMAGE_RECT = MENU_IMAGE.get_rect()
-  DISPLAYSURF.blit(MENU_IMAGE, MENU_IMAGE_RECT)
+#  MENU_IMAGE_RECT = MENU_IMAGE.get_rect()
+ # DISPLAYSURF.blit(MENU_IMAGE, MENU_IMAGE_RECT)
 
 #####################################################################################################
 
@@ -271,16 +269,16 @@ def initDisplay():
   countRows(ALL_TITLES)
 
   # Customize the icon that displays with the window
-  pygame.display.set_icon(WINDOW_ICON)
+ # pygame.display.set_icon(WINDOW_ICON)
 
   #Initialize the surface
   DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT), pygame.RESIZABLE)#,pygame.FULLSCREEN)
-  drawBackground()
+  #drawBackground()
 
 
   #Initialize other surfaces
   printEpisodes("START")
-  drawPaginator()
+  #drawPaginator()
   drawStart()
 
 #####################################################################################################
@@ -304,7 +302,7 @@ def drawStart():
     epSurf = BASEFONT.render(text, True, WHITE)
     epSurfRect = epSurf.get_rect() 
     epSurfRect.top = topCoord
-    epSurfRect.left = MENU_IMAGE.get_width()
+   # epSurfRect.left = MENU_IMAGE.get_width()
 
     # Print episode surface onto main surface and update the display
     DISPLAYSURF.blit(epSurf, epSurfRect)

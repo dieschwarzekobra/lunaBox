@@ -234,19 +234,7 @@ def paginate(keyPressed):
     drawSelector()
     drawPaginator()
 
-#####################################################################################################
-
-#Open the selected episodeURL
-def openSelectedURL():
-  #webbrowser.open(PASSED_URL)
-  epDL = 'youtube-dl --max-quality 35 -g ' + PASSED_URL
-  pygame.display.quit()
-  PASSED = subprocess.check_output(epDL, shell=True)
-  subprocess.call( [ "omxplayer", PASSED])
-  initDisplay() 
-#print PASSED#_URL
-
-#####################################################################################################
+##################################################################################################################################
 
 def drawBackground():
   #Fill the surface with a color.
@@ -352,5 +340,18 @@ def keyDownEvents():
         paginate("Down")
 
 #####################################################################################################
+
+#Open the selected episodeURL
+def openSelectedURL():
+  #webbrowser.open(PASSED_URL)
+  epDL = 'youtube-dl --max-quality 35 -g ' + PASSED_URL
+  pygame.display.quit()
+  PASSED = subprocess.check_output(epDL, shell=True)
+  #subprocess.call( [ "omxplayer", PASSED])
+  print PASSED#_URL
+
+###############################################################################$
+
+
 
 runProgram()
